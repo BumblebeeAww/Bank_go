@@ -100,7 +100,7 @@ func LoginUserHandler(w http.ResponseWriter, r *http.Request) {
     }
 
     log.Printf("User  logged in: %s", user.Username)
-    token, err := GenerateJWT(user.ID) // Используем user.ID как строку
+    token, err := GenerateJWT(user.ID) 
     if err != nil {
         respondError(w, http.StatusInternalServerError, "Failed to generate token")
         return
@@ -121,7 +121,7 @@ func CreateAccountHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    userID, ok := r.Context().Value("user").(string) // Извлекаем UserID из контекста
+    userID, ok := r.Context().Value("user").(string) 
     if !ok {
         respondError(w, http.StatusUnauthorized, "User  not found in context")
         return
@@ -129,7 +129,7 @@ func CreateAccountHandler(w http.ResponseWriter, r *http.Request) {
 
     account := Account{
         ID:        GenerateID(),
-        UserID:    userID, // Используем UserID из контекста
+        UserID:    userID, 
         Number:    GenerateAccountNumber(),
         Balance:   decimal.Zero,
         CreatedAt: time.Now(),
@@ -145,7 +145,7 @@ func CreateAccountHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetUserAccountsHandler(w http.ResponseWriter, r *http.Request) {
-    userID, ok := r.Context().Value("user").(string) // Извлекаем UserID из контекста
+    userID, ok := r.Context().Value("user").(string) 
     if !ok {
         respondError(w, http.StatusUnauthorized, "User  not found in context")
         return
@@ -187,7 +187,7 @@ func GenerateCardHandler(w http.ResponseWriter, r *http.Request) {
         CreatedAt:   time.Now(),
     }
 
-    // Загрузка публичного ключа PGP (путь берём из env)
+    // Загрузка публичного ключа PGP 
     pubKeyPath := os.Getenv("PGP_PUBLIC_KEY_PATH")
     if pubKeyPath == "" {
         respondError(w, http.StatusInternalServerError, "PGP_PUBLIC_KEY_PATH not set")
@@ -221,7 +221,7 @@ func GenerateCardHandler(w http.ResponseWriter, r *http.Request) {
     }
 
     log.Printf("Card generated for account %s", card.AccountID)
-    // Возвращаем клиенту номер карты и CVV в ответе (только при создании)
+    
     respondJSON(w, http.StatusCreated, map[string]interface{}{
         "card_id":     card.ID,
         "card_number": DecryptPGPForResponse(card.Number), // функция ниже
@@ -232,7 +232,7 @@ func GenerateCardHandler(w http.ResponseWriter, r *http.Request) {
     })
 }
 
-// Вспомогательная функция для дешифровки номера карты в ответе (использует приватный ключ)
+// Вспомогательная функция для дешифровки номера карты в ответе 
 func DecryptPGPForResponse(encrypted string) string {
     privKeyPath := os.Getenv("PGP_PRIVATE_KEY_PATH")
     if privKeyPath == "" {
@@ -326,9 +326,8 @@ func PayWithCardHandler(w http.ResponseWriter, r *http.Request) {
         respondError(w, http.StatusBadRequest, "Payment amount must be positive")
         return
     }
-
-    // Получаем карту по ID (лучше передавать card_id, а не номер)
-    card, ok := GetCardByID(req.CardNumber) // надо реализовать GetCardByID
+    
+    card, ok := GetCardByID(req.CardNumber) 
     if !ok {
         respondError(w, http.StatusNotFound, "Card not found")
         return
@@ -389,7 +388,7 @@ func GetCardByID(cardID string) (Card, bool) {
     // Проверяем HMAC
     expectedHMAC := computeCardHMAC(card)
     if !hmac.Equal([]byte(expectedHMAC), []byte(card.HMAC)) {
-        return Card{}, false // или возвращайте ошибку, если хотите
+        return Card{}, false 
     }
     return card, true
 }
@@ -524,7 +523,6 @@ func ApplyLoanHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Получаем текущую дату в формате YYYY-MM-DD
     currentDate := time.Now().Format("2006-01-02")
 
     baseRate, err := GetCBRKeyRate(currentDate)

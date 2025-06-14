@@ -1,14 +1,11 @@
 package main
 
 import (
-	"bytes"
-    //"errors"
+	"bytes"    
     "io"
     "os"
     "strings"
-	//"crypto/hmac"
-    //"crypto/sha256"
-
+	
     "golang.org/x/crypto/openpgp"
 )
 
@@ -65,4 +62,3 @@ func DecryptWithPGP(ciphertext string, privKey openpgp.EntityList) (string, erro
     }
     return string(decryptedBytes), nil
 }
-

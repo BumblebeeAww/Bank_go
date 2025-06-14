@@ -28,7 +28,6 @@
 
 	const cbrSOAPURL = "http://www.cbr.ru/DailyInfoWebServ/DailyInfo.asmx"
 
-	// Структура для разбора XML
 	type ValCurs struct {
 		XMLName xml.Name `xml:"soap:Envelope"`
 		Body    struct {
@@ -37,15 +36,14 @@
 			} `xml:"GetCursOnDateResponse"`
 		} `xml:"soap:Body"`
 	}
-
-	// Кэширование ключевых ставок
+	
 	var cachedKeyRate struct {
 		rate decimal.Decimal
 		time time.Time
 	}
 	var keyRateMutex sync.Mutex
 
-	// GetCBRKeyRate получает ключевую ставку из ЦБ
+	// Получаем ключевую ставку из ЦБ
 	func GetCBRKeyRate(date string) (decimal.Decimal, error) {
     keyRateMutex.Lock()
     defer keyRateMutex.Unlock()
@@ -96,8 +94,7 @@
     if err := doc.ReadFromBytes(bodyBytes); err != nil {
         return decimal.Zero, fmt.Errorf("не удалось прочитать XML: %w", err)
     }
-
-    // Ищем Body (учитываем, что префикс может быть любым)
+    
     var body *etree.Element
     for _, el := range doc.Root().ChildElements() {
         if strings.HasSuffix(el.Tag, "Body") {
@@ -142,7 +139,6 @@
     return rate, nil
 }
 
-
 	// Конфигурация SMTP
 	var smtpConfig = struct {
 		Host     string
@@ -157,8 +153,6 @@
 		Password: "your_password",
 		From:     "bankapp@example.com",
 	}
-
-
 
 	// ProcessPayments обрабатывает автоматические списания и штрафы
 	func ProcessPayments(db *sql.DB) {
@@ -192,18 +186,14 @@
 			payments = append(payments, p)
 		}
 
-		for _, p := range payments {
-			// Логика списания средств и начисления штрафов
-			// Пример: обновление статуса и отправка уведомления
+		for _, p := range payments {			
 			if err := processPayment(db, p); err != nil {
 				log.Printf("Ошибка при обработке платежа: %v", err)
 			}
 		}
 	}
 
-	func processPayment(db *sql.DB, p payment) error {
-		// Здесь добавьте логику списания средств со счета
-		// Например, проверка баланса, списание суммы и штрафа, обновление статуса платежа
+	func processPayment(db *sql.DB, p payment) error {		
 		_, err := db.Exec(`
 			UPDATE loan_payments
 			SET paid = TRUE
@@ -214,9 +204,7 @@
 			return fmt.Errorf("не удалось обновить статус платежа: %w", err)
 		}
 
-		log.Printf("Платеж по кредиту %d успешно обработан", p.LoanID)
-		// Отправка уведомления пользователю
-		// SendEmailNotification(...)
+		log.Printf("Платеж по кредиту %d успешно обработан", p.LoanID)		
 		return nil
 	}
 

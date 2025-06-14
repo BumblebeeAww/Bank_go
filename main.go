@@ -7,8 +7,7 @@ import (
     "net/http"
     "os"
     "time"
-
-    //"github.com/sirupsen/logrus"
+    
     log "github.com/sirupsen/logrus"
 
     "github.com/gorilla/mux"
@@ -17,12 +16,10 @@ import (
 
 var db *sql.DB
 
-// Определите пользовательский тип для ключа контекста
 type contextKey string
 
 const userContextKey contextKey = "user"
 
-// initDB инициализирует соединение с базой данных
 func initDB() {
     var err error
     connStr := "host=localhost port=5432 user=postgres password=admin dbname=BankApp sslmode=disable" // Укажите свои параметры подключения
@@ -38,7 +35,6 @@ func initDB() {
     log.Println("Успешно подключено к базе данных.")
 }
 
-// JWTMiddleware проверяет JWT токен
 func JWTMiddleware(next http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         tokenStr := r.Header.Get("Authorization")
@@ -53,13 +49,11 @@ func JWTMiddleware(next http.Handler) http.Handler {
             return
         }
 
-        // Использование пользовательского типа для ключа контекста
         ctx := context.WithValue(r.Context(), userContextKey, claims.UserID)
         next.ServeHTTP(w, r.WithContext(ctx))
     })
 }
 
-// main функция
 func main() {
     log.SetOutput(os.Stdout)
     log.SetFormatter(&log.TextFormatter{
@@ -69,8 +63,8 @@ func main() {
 
     log.Println("Запуск Simple Bank API...")
 
-    initDB()         // Инициализация соединения с БД
-    defer db.Close() // Закрытие соединения при выходе
+    initDB()         
+    defer db.Close() 
 
     // Запуск шедулера для автоматической обработки платежей
     go func() {
@@ -83,7 +77,7 @@ func main() {
 }()
 
     // Получаем курсы валют с ЦБ РФ
-    date := time.Now().Format("2025-06-14") // Используем текущую дату
+    date := time.Now().Format("2025-06-14") 
     keyRate, err := GetCBRKeyRate(date)
     if err != nil {
         log.Printf("Ошибка при получении курса валюты: %v", err)
@@ -125,7 +119,6 @@ func main() {
     }
 }
 
-// loggingMiddleware логирует HTTP-запросы
 func loggingMiddleware(next http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         start := time.Now()

@@ -25,12 +25,12 @@ type Account struct {
 type Card struct {
     ID          string    `json:"id"`
     AccountID   string    `json:"account_id"`
-    Number      string    `json:"number"`      // Зашифрованный номер карты (PGP)
+    Number      string    `json:"number"`      
     ExpiryMonth int       `json:"expiry_month"`
     ExpiryYear  int       `json:"expiry_year"`
-    CVV         string    `json:"cvv"`         // Хэшированный CVV (bcrypt)
+    CVV         string    `json:"cvv"`         
     CreatedAt   time.Time `json:"created_at"`
-    HMAC        string    `json:"hmac"`        // HMAC для проверки целостности
+    HMAC        string    `json:"hmac"`        
 }
 
 type Transaction struct {
@@ -115,5 +115,3 @@ type ScheduledPayment struct {
     DueDate   time.Time `db:"due_date"`
     Paid      bool      `db:"paid"`
 }
-
-

@@ -14,8 +14,8 @@ type InMemoryStorage struct {
 	accounts     map[string]Account  // key: AccountID
 	cards        map[string]Card     // key: CardID
 	loans        map[string]Loan     // key: LoanID
-	transactions []Transaction       // Просто список всех транзакций
-	userIndex    map[string]string   // key: Username -> UserID (для быстрой проверки уникальности)
+	transactions []Transaction       // список всех транзакций
+	userIndex    map[string]string   // key: Username -> UserID 
 	emailIndex   map[string]string   // key: Email -> UserID
 	accountIndex map[string][]string // key: UserID -> []AccountID
 	cardIndex    map[string][]string // key: AccountID -> []CardID
@@ -135,13 +135,10 @@ func GetAccountTransactions(accountID string) []Transaction {
 	return accountTxs
 }
 
-
-// Секретный ключ для HMAC — лучше брать из конфигурации/окружения
 var secretHMACKey = []byte("your-secret-hmac-key")
 
-// Вспомогательная функция для генерации HMAC карты
-func computeCardHMAC(card Card) string {
-    // Конкатенируем важные поля карты
+// Функция для генерации HMAC карты
+func computeCardHMAC(card Card) string {    
     data := card.Number + card.CVV + fmt.Sprintf("%02d%04d", card.ExpiryMonth, card.ExpiryYear)
     return GenerateHMAC(data, secretHMACKey)
 }
@@ -160,10 +157,8 @@ func AddCard(card Card) error {
         return fmt.Errorf("account %s not found", card.AccountID)
     }
 
-    // --- Вот здесь добавляем генерацию HMAC ---
     card.HMAC = computeCardHMAC(card)
-
-    // Сохраняем карту с HMAC
+    
     storage.cards[card.ID] = card
     storage.cardIndex[card.AccountID] = append(storage.cardIndex[card.AccountID], card.ID)
 

@@ -115,7 +115,6 @@ func ValidateCardNumberLuhn(cardNumber string) bool {
     return sum%10 == 0
 }
 
-// Вычисление контрольной цифры для номера карты
 func calculateLuhnCheckDigit(number string) int {
     sum := 0
     alt := true
@@ -137,9 +136,8 @@ func calculateLuhnCheckDigit(number string) int {
     return 10 - mod
 }
 
-// Генерация валидного номера карты с проверкой по Луна
 func GenerateValidCardNumber() string {
-    prefix := "4" // например, Visa начинается с 4
+    prefix := "4" 
     length := 16
     for {
         number := prefix
